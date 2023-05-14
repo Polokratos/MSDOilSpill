@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-
-
 public class Point{
 
 	private static final int SFMAX = 100000;

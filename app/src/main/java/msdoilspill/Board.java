@@ -6,21 +6,15 @@ import java.awt.Insets;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
-
-import java.util.HashSet;
 
 public class Board extends JComponent implements MouseInputListener, ComponentListener {
 	private static final long serialVersionUID = 1L;
 	private Point[][] points;
 	private int size = 10;
 	public int editType=0;
-	private int neighborhood = 1;
-	
-	private static final int SFMAX = 100000;
 
 	public Board(int length, int height) {
 		addMouseListener(this);
@@ -44,7 +38,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			for (int y = 0; y < points[x].length; ++y) {
 				points[x][y].clear();
 			}
-		calculateField();
 		this.repaint();
 	}
 
@@ -54,18 +47,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (int x = 0; x < points.length; ++x)
 			for (int y = 0; y < points[x].length; ++y)
 				points[x][y] = new Point();
-
-		for (int x = 1; x < points.length-1; ++x) {
-			for (int y = 1; y < points[x].length-1; ++y) {
-				
-				// add neighbours
-				}
-		}
-		
-	}
-	
-	public void calculateField(){
-		
+		//TODO: Likely nescesary to add neighbourhood.		
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -98,23 +80,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 		for (x = 1; x < points.length-1; ++x) {
 			for (y = 1; y < points[x].length-1; ++y) {
-				if(points[x][y].type==0){
-					float staticField = points[x][y].staticField;
-					float intensity = staticField/100;
-					if (intensity > 1.0) {
-						intensity = 1.0f;
-					}
-					g.setColor(new Color(intensity, intensity,intensity ));
-				}
-				else if (points[x][y].type==1){
-					g.setColor(new Color(1.0f, 0.0f, 0.0f, 0.7f));
-				}
-				else if (points[x][y].type==2){
-					g.setColor(new Color(0.0f, 1.0f, 0.0f, 0.7f));
-				}
-				if (points[x][y].isPedestrian){
-					g.setColor(new Color(0.0f, 0.0f, 1.0f, 0.7f));
-				}
+				Color toSet = new Color(255,255,255); //TODO: Add coloring UI logic
+				g.setColor(toSet);
 				g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
 			}
 		}
@@ -125,13 +92,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		int x = e.getX() / size;
 		int y = e.getY() / size;
 		if ((x < points.length) && (x > 0) && (y < points[x].length) && (y > 0)) {
-			if(editType==3){
-				points[x][y].isPedestrian = true;
-				points[x][y].type = editType;
-			}
-			else{
-				points[x][y].type = editType;
-			}
+			points[x][y].type = editType;
 			this.repaint();
 		}
 	}
@@ -146,12 +107,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		int x = e.getX() / size;
 		int y = e.getY() / size;
 		if ((x < points.length) && (x > 0) && (y < points[x].length) && (y > 0)) {
-			if(editType==3){
-				points[x][y].isPedestrian=true;
-			}
-			else{
-				points[x][y].type= editType;
-			}
+			points[x][y].type= editType;
 			this.repaint();
 		}
 	}
