@@ -11,12 +11,35 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 public class Board extends JComponent implements MouseInputListener, ComponentListener {
+	private static Integer BoardHeight = null;
+	public static void setBoardHeight(int value)
+	{
+		if(BoardHeight == null)
+			BoardHeight = value;
+		else throw new RuntimeException("BoardHeight may be set only once!");
+	}
+
+	private static Integer BoardWidth = null;
+	public static void setBoardWidth(int value)
+	{
+		if(BoardWidth == null)
+			BoardWidth = value;
+		else throw new RuntimeException("BoardHeight may be set only once!");
+	}
+	private static Board instance = null;
+	public static Board getInstance()
+	{
+		if(instance == null)
+			instance = new Board(BoardWidth,BoardHeight);
+		return instance;
+	}
+
 	private static final long serialVersionUID = 1L;
-	private Cell[][] points;
+	public Cell[][] cells;
 	private int size = 10;
 	public int editType=0;
 
-	public Board(int length, int height) {
+	private Board(int length, int height) {
 		addMouseListener(this);
 		addComponentListener(this);
 		addMouseMotionListener(this);
@@ -25,29 +48,78 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		initialize(length, height);
 	}
 
-	public void iteration() {	
-		for (int x = 1; x < points.length - 1; ++x)
-			for (int y = 1; y < points[x].length - 1; ++y)
-				points[x][y].move();
-		
+	public void iteration() {
+		Spiller.spill();
+		advection();
+
+		confirmCellMovenent();
 		this.repaint();
 	}
 
+	//#region Iteration component functions
+	public void advection(){
+		for (int x = 1; x < cells.length -1; ++x)
+			for (int y = 1; y < cells[x].length -1; ++y)
+			{
+				int deltaX_m = (int) (Globals.AdvectionAlpha*cells[x][y].CEV.currentX_ms+Globals.AdvectionBeta*cells[x][y].CEV.windX_ms)*Globals.simulationStep_s;
+				int deltaY_m = (int) (Globals.AdvectionAlpha*cells[x][y].CEV.currentY_ms+Globals.AdvectionBeta*cells[x][y].CEV.windY_ms)*Globals.simulationStep_s;
+				for (OilParticle ops : cells[x][y].CIV.getParticles()) {
+					ops.advectionMovement(deltaX_m, deltaY_m);
+				}
+			}
+	}
+	public void spreading(){
+
+	}
+	public void evaporation() {
+
+	}
+	public void emulsification() {
+
+	}
+	public void dispersion() {
+
+	}
+	public void viscosityChange() {
+
+	}
+	public void seashoreInteraction() {
+
+	}
+
+	public void confirmCellMovenent(){
+		for (OilParticle op : OilParticle.allParticles) {
+			op.confirmMovement();
+		}
+	}
+	//#endregion
+
 	public void clear() {
-		for (int x = 0; x < points.length; ++x)
-			for (int y = 0; y < points[x].length; ++y) {
-				points[x][y].clear();
+		for (int x = 0; x < cells.length; ++x)
+			for (int y = 0; y < cells[x].length; ++y) {
+				cells[x][y].clear();
 			}
 		this.repaint();
 	}
 
 	private void initialize(int length, int height) {
-		points = new Cell[length][height];
+		cells = new Cell[length][height];
 
-		for (int x = 0; x < points.length; ++x)
-			for (int y = 0; y < points[x].length; ++y)
-				points[x][y] = new Cell();
-		//TODO: Likely nescesary to add neighbourhood.		
+		for (int x = 0; x < cells.length; ++x)
+			for (int y = 0; y < cells[x].length; ++y)
+				cells[x][y] = new Cell();
+		for (int x = 1; x < cells.length -1; ++x)
+			for (int y = 1; y < cells[x].length -1; ++y)
+			{
+				cells[x][y].addNeighbor(cells[x+1][y]);
+				cells[x][y].addNeighbor(cells[x-1][y]);
+				cells[x][y].addNeighbor(cells[x][y+1]);
+				cells[x][y].addNeighbor(cells[x][y-1]);
+				cells[x][y].addNeighbor(cells[x+1][y+1]);
+				cells[x][y].addNeighbor(cells[x-1][y+1]);
+				cells[x][y].addNeighbor(cells[x+1][y-1]);
+				cells[x][y].addNeighbor(cells[x-1][y-1]);
+			}
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -78,10 +150,9 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			y += gridSpace;
 		}
 
-		for (x = 1; x < points.length-1; ++x) {
-			for (y = 1; y < points[x].length-1; ++y) {
-				Color toSet = new Color(255,255,255); //TODO: Add coloring UI logic
-				g.setColor(toSet);
+		for (x = 1; x < cells.length-1; ++x) {
+			for (y = 1; y < cells[x].length-1; ++y) {
+				g.setColor(cells[x][y].getColor());
 				g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
 			}
 		}
@@ -91,8 +162,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX() / size;
 		int y = e.getY() / size;
-		if ((x < points.length) && (x > 0) && (y < points[x].length) && (y > 0)) {
-			points[x][y].type = editType;
+		if ((x < cells.length) && (x > 0) && (y < cells[x].length) && (y > 0)) {
+			cells[x][y].type = editType;
 			this.repaint();
 		}
 	}
@@ -106,8 +177,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void mouseDragged(MouseEvent e) {
 		int x = e.getX() / size;
 		int y = e.getY() / size;
-		if ((x < points.length) && (x > 0) && (y < points[x].length) && (y > 0)) {
-			points[x][y].type= editType;
+		if ((x < cells.length) && (x > 0) && (y < cells[x].length) && (y > 0)) {
+			cells[x][y].type= editType;
 			this.repaint();
 		}
 	}
