@@ -12,7 +12,7 @@ import javax.swing.event.MouseInputListener;
 
 public class Board extends JComponent implements MouseInputListener, ComponentListener {
 	private static final long serialVersionUID = 1L;
-	private Point[][] points;
+	private Cell[][] points;
 	private int size = 10;
 	public int editType=0;
 
@@ -42,11 +42,11 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	private void initialize(int length, int height) {
-		points = new Point[length][height];
+		points = new Cell[length][height];
 
 		for (int x = 0; x < points.length; ++x)
 			for (int y = 0; y < points[x].length; ++y)
-				points[x][y] = new Point();
+				points[x][y] = new Cell();
 		//TODO: Likely nescesary to add neighbourhood.		
 	}
 
