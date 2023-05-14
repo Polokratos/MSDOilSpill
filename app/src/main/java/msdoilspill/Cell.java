@@ -8,8 +8,6 @@ public class Cell{
 	//Required by GUI (jak jest menu wyboru typu to stąd bierze opcje)
 	public static Integer []types ={0,1,2,3};
 	public int type;
-	public int staticField;
-	public boolean isPedestrian;
 
 	public Cell() {
 	}
