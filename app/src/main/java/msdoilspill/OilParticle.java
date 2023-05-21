@@ -3,9 +3,12 @@ package msdoilspill;
 import java.util.ArrayList;
 
 public class OilParticle {
+    public static int initial_mass_kg = 20;
+
     public static ArrayList<OilParticle> allParticles = new ArrayList<>();
-    public static int mass_kg = 20; 
     
+    public OPS OPS;
+
     public int location_x_m; // X coordinate, in meters.
     public int location_y_m; // Y coorddinate, in meters.
     public Cell occupying;
@@ -15,10 +18,11 @@ public class OilParticle {
 
     public OilParticle(int x_m,int y_m)
     {
+        OPS.mass_kg = initial_mass_kg;
         location_x_m = x_m;
         location_y_m = y_m;
         occupying = cacheoccupiedCell();
-        occupying.CIV.addParticle(this);
+        occupying.civ.addParticle(this);
         allParticles.add(this);
     }
 
@@ -34,10 +38,10 @@ public class OilParticle {
         location_x_m += locationDelta_x_m;
         location_y_m += locationDelta_y_m;
         locationDelta_x_m = locationDelta_y_m = 0;
-        occupying.CIV.removeParticle(this);
+        occupying.civ.removeParticle(this);
         occupying = cacheoccupiedCell();
         if(occupying != null)
-            occupying.CIV.addParticle(this);
+            occupying.civ.addParticle(this);
     }
 
     private Cell cacheoccupiedCell()

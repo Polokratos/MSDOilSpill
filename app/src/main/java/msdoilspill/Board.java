@@ -51,7 +51,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void iteration() {
 		Spiller.spill();
 		advection();
-
+		spreading();
+		
 		confirmCellMovenent();
 		this.repaint();
 	}
@@ -61,15 +62,20 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (int x = 1; x < cells.length -1; ++x)
 			for (int y = 1; y < cells[x].length -1; ++y)
 			{
-				int deltaX_m = (int) (Globals.AdvectionAlpha*cells[x][y].CEV.currentX_ms+Globals.AdvectionBeta*cells[x][y].CEV.windX_ms)*Globals.simulationStep_s;
-				int deltaY_m = (int) (Globals.AdvectionAlpha*cells[x][y].CEV.currentY_ms+Globals.AdvectionBeta*cells[x][y].CEV.windY_ms)*Globals.simulationStep_s;
-				for (OilParticle ops : cells[x][y].CIV.getParticles()) {
+				int deltaX_m = (int) (Globals.AdvectionAlpha*cells[x][y].cev.currentX_ms+Globals.AdvectionBeta*cells[x][y].cev.windX_ms)*Globals.simulationStep_s;
+				int deltaY_m = (int) (Globals.AdvectionAlpha*cells[x][y].cev.currentY_ms+Globals.AdvectionBeta*cells[x][y].cev.windY_ms)*Globals.simulationStep_s;
+				for (OilParticle ops : cells[x][y].civ.getParticles()) {
 					ops.advectionMovement(deltaX_m, deltaY_m);
 				}
 			}
 	}
 	public void spreading(){
-
+		for (int x = 0; x < cells.length; ++x)
+			for (int y = 0; y < cells[x].length; ++y)
+			{
+				cells[x][y].calculateSpreading(cells[x][y+1],0,1); //Von Neumann.
+				cells[x][y].calculateSpreading(cells[x+1][y],1,0);
+			}
 	}
 	public void evaporation() {
 
@@ -108,18 +114,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (int x = 0; x < cells.length; ++x)
 			for (int y = 0; y < cells[x].length; ++y)
 				cells[x][y] = new Cell();
-		for (int x = 1; x < cells.length -1; ++x)
-			for (int y = 1; y < cells[x].length -1; ++y)
-			{
-				cells[x][y].addNeighbor(cells[x+1][y]);
-				cells[x][y].addNeighbor(cells[x-1][y]);
-				cells[x][y].addNeighbor(cells[x][y+1]);
-				cells[x][y].addNeighbor(cells[x][y-1]);
-				cells[x][y].addNeighbor(cells[x+1][y+1]);
-				cells[x][y].addNeighbor(cells[x-1][y+1]);
-				cells[x][y].addNeighbor(cells[x+1][y-1]);
-				cells[x][y].addNeighbor(cells[x-1][y-1]);
-			}
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -130,6 +124,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		g.setColor(Color.GRAY);
 		drawNetting(g, size);
 	}
+
 
 	private void drawNetting(Graphics g, int gridSpace) {
 		Insets insets = getInsets();

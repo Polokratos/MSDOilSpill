@@ -7,7 +7,7 @@ public class Spiller {
      */
     public static void spill()
     {
-        spillInPlace(50,35,10000);
+        spillInPlace(50,35,1000);
     }
 
     /*
@@ -15,7 +15,7 @@ public class Spiller {
      */
     private static void spillInPlace(int x, int y, int spillMass_kg)
     {
-        int OPamt = spillMass_kg / OilParticle.mass_kg;
+        int OPamt = spillMass_kg / OilParticle.initial_mass_kg;
         for (int i = 0; i < OPamt; i++) {
             int x_m = x*CEV.cellSize_m + RNG.getInstance().nextInt(CEV.cellSize_m);
             int y_m = y*CEV.cellSize_m + RNG.getInstance().nextInt(CEV.cellSize_m);
