@@ -12,4 +12,6 @@ public class CEV {
     public int currentY_ms = 6; //m/s
     public int temperature_K = 300;
 
+    public double shoreline_half_life = 1;
+
 }

@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -52,7 +53,8 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		Spiller.spill();
 		advection();
 		spreading();
-		
+		seashoreInteraction();
+
 		confirmCellMovenent();
 		this.repaint();
 	}
@@ -90,7 +92,32 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	}
 	public void seashoreInteraction() {
-
+		for (int x = 1; x<cells.length-1; ++x)
+			for (int y = 1; y<cells[x].length-1; ++y){
+				ArrayList<Integer> ocean_neighbours = new ArrayList<>();
+				for (int x1=-1; x1<=1; ++x1){
+					for (int y1=-1; y1<=1; ++y1){
+						if (x1!=0 && y1!=0 && cells[x+x1][y+y1].type==0){
+							ocean_neighbours.add((x1+1)*3 + (y1+1));
+						}
+					}
+				}
+				if (cells[x][y].type==1){
+					double total_mass = cells[x][y].civ.getTotalMass_kg();
+					double d_mass = -Math.log(2)/cells[x][y].cev.shoreline_half_life
+							*total_mass*Globals.simulationStep_s;
+					double probability = Math.abs(d_mass)/total_mass;
+					for (OilParticle oil_p: cells[x][y].civ.getParticles()){
+						if (RNG.getInstance().nextDouble()<probability){
+							int r = RNG.getInstance().nextInt(ocean_neighbours.size());
+							int cell_x = ocean_neighbours.get(r)/3-1;
+							int cell_y = ocean_neighbours.get(r)%3 - 1;
+							oil_p.locationDelta_x_m+=(cell_x-x)*CEV.cellSize_m;
+							oil_p.locationDelta_y_m+=(cell_y-y)*CEV.cellSize_m;
+						}
+					}
+				}
+			}
 	}
 
 	public void confirmCellMovenent(){
