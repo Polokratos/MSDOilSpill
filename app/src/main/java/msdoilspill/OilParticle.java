@@ -16,6 +16,7 @@ public class OilParticle {
     public int locationDelta_x_m;
     public int locationDelta_y_m;
 
+    //FIXME: Refactor via factory
     public OilParticle(int x_m,int y_m)
     {
         OPS.mass_kg = initial_mass_kg;
