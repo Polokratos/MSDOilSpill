@@ -71,6 +71,9 @@ for x in UsefulDrifterStamps:
     if(int(time[1]) >= 30):
         x.Time+=1
 
-LENGTH = -1
-HEIGHT = -1
+LENGTH = 454//2 #2x2 km
+HEIGHT = 800//2 
 TIME = 24*145 #24h * 145 days, i got this from sorting useful stamps via date.
+
+#How to get to a datapoint from this array: CEV[x][y][t] (x => length, y=> height, t => time)
+CEV = [[[None for _ in range(TIME)] for _ in range(HEIGHT)] for _ in range(LENGTH)]
