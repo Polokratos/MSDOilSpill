@@ -15,7 +15,7 @@ Right_bd = -84.862920
 #454 x 800km => 227 x 400 cells.
 LENGTH = 454//2 #2x2 km
 HEIGHT = 800//2 
-TIME = 336 # 2 tyg.
+TIME = 3 # 2 tyg.
 
 #28.736628 -88.365997 Rig Location
 
@@ -80,8 +80,8 @@ for x in UsefulDrifterStamps:
     x.Time += 24*x.Date
     x.Time = x.Time //1
 
-#Filter to 2 weeks after the fact
-UsefulDrifterStamps = [x for x in UsefulDrifterStamps if x.Time < 336]
+#Filter to useful by time
+UsefulDrifterStamps = [x for x in UsefulDrifterStamps if x.Time < TIME]
 
 #Converter from Lon and Lat to a cell.
 def LonLatToCell(Lon,Lat):
@@ -153,4 +153,10 @@ for x in range(LENGTH):
             CEV[x][y][t] = [u,v]
         
 
-print(CEV)
+for t in range(TIME):
+    file = open(str(t)+".csv","w")
+    for y in range(HEIGHT):
+        for x in range(LENGTH-1):
+            file.write(str(CEV[x][y][t])+",")
+        file.write(str(CEV[x][y][t])+"\n")
+
