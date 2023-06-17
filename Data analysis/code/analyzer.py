@@ -153,10 +153,14 @@ for x in range(LENGTH):
             CEV[x][y][t] = [u,v]
         
 
+#replace internal commas with semicolons to have commas ONLY at value change, remove brackets and spaces
+def trimstr(str:str):
+    return str.replace(",",";").replace(" ","").replace("[","").replace("]","")
+
 for t in range(TIME):
     file = open(str(t)+".csv","w")
     for y in range(HEIGHT):
         for x in range(LENGTH-1):
-            file.write(str(CEV[x][y][t]).replace(",",";")+",") #replace internal commas with semicolons to have commas ONLY at value change
-        file.write(str(CEV[x][y][t]).replace(",",";")+"\n")
+            file.write(trimstr(str(CEV[x][y][t]))+",") 
+        file.write(trimstr(str(CEV[x][y][t]))+"\n")
 
