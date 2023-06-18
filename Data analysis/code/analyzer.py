@@ -1,6 +1,7 @@
 import os
 import csv
 import datetime
+import math
 
 #Data sources
 CG = "../OillSPill/Cost_Guard"
@@ -26,13 +27,13 @@ def between(left,toCheck,right):
 
 #Class for unifying structure for both CG and OCG.
 class DrifterStamp:
-    def __init__(self,Date,Time,Lat,Lon,speed,dir,u,v,sst=None) -> None:
+    def __init__(self,Date,Time,Lat,Lon,speed,dir_,u,v,sst=None) -> None:
         self.Date = Date
         self.Time = Time
         self.Lat = Lat
         self.Lon = Lon
         self.speed = speed
-        self.dir = dir
+        self.dir = dir_
         self.u = u
         self.v = v
         self.sst = sst
@@ -98,6 +99,7 @@ def LonLatToCell(Lon,Lat):
     return [int(x),int(y)]
     
 #How to get to a datapoint from this array: CEV[x][y][t] (x => length, y=> height, t => time)
+# 0 - u, 1 - v, 2 - u_wind, 3 - v_wind
 CEV = [[[None for _ in range(TIME)] for _ in range(HEIGHT)] for _ in range(LENGTH)]
 
 LockedDPList = [] #LockedDPList[index] =  [x,y,t]
@@ -106,20 +108,26 @@ LockedDPList = [] #LockedDPList[index] =  [x,y,t]
 for ds in UsefulDrifterStamps:
     [x,y] = LonLatToCell(float(ds.Lon),float(ds.Lat))
     if(CEV[x][y][ds.Time] == None):
-        CEV[x][y][ds.Time] = [ds.u,ds.v]
+        CEV[x][y][ds.Time] = [ds.u,ds.v,float(ds.speed)*math.cos(math.radians(float(ds.dir))),float(ds.speed)*math.sin(math.radians(float(ds.dir)))]
         LockedDPList.append([x,y,ds.Time])
     else:
         CEV[x][y][ds.Time].append(ds.u)
         CEV[x][y][ds.Time].append(ds.v)
+        CEV[x][y][ds.Time].append( float(ds.speed)*math.cos(math.radians(float(ds.dir))) )
+        CEV[x][y][ds.Time].append( float(ds.speed)*math.sin(math.radians(float(ds.dir))) )
 
 #Locked CEV averaging, for when there are multiple u and v values.
 for lkd in LockedDPList:
     allVals = CEV[lkd[0]][lkd[1]][lkd[2]] #Grab 
-    allU = [float(allVals[x]) for x in range(len(allVals)) if x%2 == 0] #Extract
-    allV = [float(allVals[x]) for x in range(len(allVals)) if x%2 == 1]
+    allU = [float(allVals[x]) for x in range(len(allVals)) if x%4 == 0] #Extract
+    allV = [float(allVals[x]) for x in range(len(allVals)) if x%4 == 1]
+    all_windU = [float(allVals[x]) for x in range(len(allVals)) if x%4 == 2]
+    all_windV = [float(allVals[x]) for x in range(len(allVals)) if x%4 == 3]
     U = sum(allU) / len(allU) #calculate avg
     V = sum(allV) / len(allV)
-    CEV[lkd[0]][lkd[1]][lkd[2]] = [U,V] #Put the avg back.
+    W_U = sum(all_windU) / len(all_windU)
+    W_V = sum(all_windV) / len(all_windV)
+    CEV[lkd[0]][lkd[1]][lkd[2]] = [U,V,W_U,W_V] #Put the avg back.
 
 #EKSTRAPOLACJA
 # Biore srednia ważoną z wszystkich znanych eksperymentalnie wartości, gdzie premiuje to co jest blisko czy to dystansowo, czy to czasowo. (waga to 1/ odleglosc)
@@ -131,8 +139,10 @@ for x in range(LENGTH):
         for t in range(TIME):
             if(CEV[x][y][t] != None): # We have this via experimental data.
                 continue
-            u = 0.0
+            u = 0.0 #Current
             v = 0.0
+            wu = 0.0 #Wind
+            wv = 0.0
             total_weight = 0.0
             for ref in LockedDPList:
                 
@@ -146,11 +156,15 @@ for x in range(LENGTH):
                 
                 u+= float(cell[0])*delta  
                 v+= float(cell[1])*delta
+                wu += float(cell[2])*delta
+                wv += float(cell[3])*delta
                 total_weight += delta
             
             u/= total_weight
             v/= total_weight
-            CEV[x][y][t] = [u,v]
+            wu /= total_weight
+            wv /= total_weight
+            CEV[x][y][t] = [u,v,wu,wv]
         
 
 #replace internal commas with semicolons to have commas ONLY at value change, remove brackets and spaces

@@ -28,6 +28,8 @@ public class CEVLoader {
                 
                 dest[x][y].cev.currentX_ms = Double.parseDouble(values[0]);
                 dest[x][y].cev.currentY_ms = Double.parseDouble(values[1]);
+                dest[x][y].cev.windX_ms = Double.parseDouble(values[2]);
+                dest[x][y].cev.windY_ms = Double.parseDouble(values[3]);
             }
             y++;
         }

@@ -23,5 +23,8 @@ public class CEVLoaderTest {
         CEVLoader.LoadToCells(path, dst);
         //Quick check of the first value
         assert Math.abs(dst[0][0].cev.currentX_ms + 0.03127952059190637) < 0.01;
+        assert Math.abs(dst[0][0].cev.currentY_ms + 0.034956164248675016) < 0.01;
+        assert Math.abs(dst[0][0].cev.windX_ms + 0.034956245659800475) < 0.01;
+        assert Math.abs(dst[0][0].cev.windY_ms + 0.03127942059236447) < 0.01;
     }
 }
