@@ -19,7 +19,7 @@ public class OilParticle {
     //FIXME: Refactor via factory
     public OilParticle(int x_m,int y_m)
     {
-        OPS.mass_kg = initial_mass_kg;
+        OPS = new OPS(initial_mass_kg);
         location_x_m = x_m;
         location_y_m = y_m;
         occupying = cacheoccupiedCell();

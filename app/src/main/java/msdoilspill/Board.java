@@ -53,6 +53,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		Spiller.spill();
 		advection();
 		spreading();
+		emulsification();
 		seashoreInteraction();
 
 		confirmCellMovenent();
@@ -80,10 +81,28 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			}
 	}
 	public void evaporation() {
-
+//		for (int x = 1; x< cells.length-1; ++x){
+//			for (int y = 1; y< cells[x].length-1; ++y){
+//				double POI = 1000 * Math.exp(-(4.4 + Math.log(Globals.EvaporationTb)) *
+//						(1.803 * (Globals.EvaporationTbI/cells[x][y].cev.temperature_K-1)-
+//								0.803*Math.log(Globals.EvaporationTbI/cells[x][y].cev.temperature_K)));
+//				double MI = 2.41 * Math.pow(10, -6) * (Math.pow(Globals.EvaporationTbI, 2.847) * ()
+//				double Ei = 1.25 * Math.pow(10, -3) * MI * POI * xi / (8.314 * cells[x][y].cev.temperature_K);
+//				double dMi = Ei * cells[x][y].cev.
+//			}
+//		}
 	}
 	public void emulsification() {
-
+		for (int x=1; x<cells.length; ++x){
+			for (int y=1; y<cells[x].length; ++y){
+				double wind_state = Math.pow(Math.pow(Math.pow(cells[x][y].cev.windX_ms, 2) + Math.pow(cells[x][y].cev.windY_ms, 2), 0.5) + 1, 2);
+				for (OilParticle op: cells[x][y].civ.getParticles()) {
+					double Yk = op.OPS.water_mass_kg/(op.OPS.water_mass_kg+ op.OPS.mass_kg);
+					double dYk = 2.0 * 10e-6* wind_state * (1 - Yk / 0.7) * Globals.simulationStep_s;
+					op.OPS.water_mass_kg = (Yk+dYk)*op.OPS.mass_kg / (1 - Yk+dYk);
+				}
+			}
+		}
 	}
 	public void dispersion() {
 
