@@ -6,10 +6,12 @@ import java.awt.Insets;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
+
 
 public class Board extends JComponent implements MouseInputListener, ComponentListener {
 	private static Integer BoardHeight = null;
@@ -37,7 +39,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	private static final long serialVersionUID = 1L;
 	public Cell[][] cells;
-	private int size = 10;
+	private int size = 3;
 	public int editType=0;
 
 	private Board(int length, int height) {
@@ -157,10 +159,14 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private void initialize(int length, int height) {
 		cells = new Cell[length][height];
 
-		for (int x = 0; x < cells.length; ++x)
-			for (int y = 0; y < cells[x].length; ++y)
-				cells[x][y] = new Cell();
-	}
+        try {
+            MapLoader.initCells(length, height, "src/main/resources/map.txt", cells);
+        } catch (FileNotFoundException e) {
+            System.out.println("Failed to load cell types from file: " + e.getMessage());
+            System.exit(1);
+        }
+
+}
 
 	protected void paintComponent(Graphics g) {
 		if (isOpaque()) {
@@ -209,11 +215,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		}
 	}
 
-	public void componentResized(ComponentEvent e) {
-		int dlugosc = (this.getWidth() / size) + 1;
-		int wysokosc = (this.getHeight() / size) + 1;
-		initialize(dlugosc, wysokosc);
-	}
+	public void componentResized(ComponentEvent e) {}
 
 	public void mouseDragged(MouseEvent e) {
 		int x = e.getX() / size;

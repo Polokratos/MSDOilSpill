@@ -64,9 +64,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		buttonPanel.add(drawType);
 		buttonPanel.add(pred);
 
-		//board = new Board(1024, 768 - buttonPanel.getHeight());
-		Board.setBoardWidth(1024);
-		Board.setBoardHeight(768 - buttonPanel.getHeight());
+		Board.setBoardWidth(400);
+		Board.setBoardHeight(227);
 		board = Board.getInstance();
 
 		container.add(board, BorderLayout.CENTER);

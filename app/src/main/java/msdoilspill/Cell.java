@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class Cell{
 	
+    private static final int LAND = 1, SHORE = 2, WATER = 3;
+
 	public ArrayList<Cell> neighbors = new ArrayList<>();
 	//Required by GUI (jak jest menu wyboru typu to stąd bierze opcje)
 	public static Integer []types ={0,1,2,3};
@@ -13,7 +15,8 @@ public class Cell{
 	public CEV cev = new CEV();
 	public CIV civ = new CIV();
 
-	public Cell() {
+	public Cell(int type) {
+        this.type = type;
 	}
 	
 	public void clear() {
@@ -31,10 +34,19 @@ public class Cell{
 	 */
 	public Color getColor()
 	{
-		int intensity = civ.getTotalMass_kg() / 10;
-		intensity = Math.max(intensity,0);
-		intensity = Math.min(intensity,255);
-		return new Color(0,0,255-intensity);
+        switch (type) {
+            case LAND: 
+                return new Color(230, 230, 174);
+            case SHORE:
+                return new Color(92, 212, 165);
+            case WATER:
+                int intensity = civ.getTotalMass_kg() / 10;
+                intensity = Math.max(intensity,0);
+                intensity = Math.min(intensity,255);
+                return new Color(53,166,255-intensity);
+            default:
+                return new Color (255, 255, 255);
+        }
 	}
 	
 	public void calculateSpreading(Cell with, int dX, int dY) /*dX, dY ==> FROM THIS TO WITH AT -1,0,1 scale*/
