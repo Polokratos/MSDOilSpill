@@ -28,14 +28,24 @@ public class CIV {
         return retval;
     }
 
-    public int getTotalVolume_m3()
-    {
-        throw new RuntimeErrorException(null);
+    public double getTotalVolume_m3() {
+        double retval = 0;
+        for (OilParticle oilParticle : currentParticles) {
+            retval+=oilParticle.OPS.mass_kg/Globals.oilDensity_kg_over_m3 + oilParticle.OPS.water_mass_kg/Globals.waterDensity_kg_over_m3;
+        }
+        return retval;
     }
-
-    public int getKinematicViscosity_kg_over_ms()
+    public double getKinematicViscosity_kg_over_ms()
     {
-        throw new RuntimeErrorException(null);
+        double water = 0;
+        double oil = 0;
+        for (OilParticle oilParticle : currentParticles) {
+            water+=oilParticle.OPS.water_mass_kg;
+            oil+=oilParticle.OPS.mass_kg;
+        }
+        double density = (oil*Globals.oilDensity_kg_over_m3 + water*Globals.waterDensity_kg_over_m3)/(oil+water);
+        double kv = (oil * Globals.oilDynamicViscosity + water*Globals.waterDynamicViscosity)/(density * (oil+water));
+        return kv;
     }
 
     public int getDensityDelta()

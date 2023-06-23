@@ -36,6 +36,10 @@ public class OilParticle {
 
     public void confirmMovement()
     {
+        if (OPS.mass_kg<=0){
+            occupying.civ.removeParticle(this);
+            return;
+        }
         location_x_m += locationDelta_x_m;
         location_y_m += locationDelta_y_m;
         locationDelta_x_m = locationDelta_y_m = 0;
@@ -53,5 +57,8 @@ public class OilParticle {
             return Board.getInstance().cells[x][y];
         //out of AO. FIXME: Right now oil decays on the borders, without actually leaving the AO. Intended?
         return null;
+    }
+    public double getDynamicViscosity(){
+        return (OPS.mass_kg * Globals.oilDynamicViscosity + OPS.water_mass_kg * Globals.waterDynamicViscosity)/(OPS.mass_kg + OPS.water_mass_kg);
     }
 }

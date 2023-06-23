@@ -7,7 +7,7 @@ public class Spiller {
      */
     public static void spill()
     {
-        spillInPlace(50,35,1000);
+        spillInPlace(200,100,1000);
     }
 
     /*

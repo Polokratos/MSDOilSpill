@@ -53,7 +53,8 @@ public class Cell{
 	{
 		double kinematic_viscosity_avg = (this.civ.getKinematicViscosity_kg_over_ms() + with.civ.getKinematicViscosity_kg_over_ms())/2;
 		double volume_total = this.civ.getTotalVolume_m3() + with.civ.getTotalVolume_m3();
-		double density_delta = (this.civ.getDensityDelta()+with.civ.getDensityDelta())/2;
+//		double density_delta = (this.civ.getDensityDelta()+with.civ.getDensityDelta())/2;
+		double density_delta = (Globals.waterDensity_kg_over_m3-Globals.oilDensity_kg_over_m3)/Globals.waterDensity_kg_over_m3;
 		double t = 1; //FIXME: Unknowable
 		double n = 3; // From "calibrations" - wartosc z dupy
 		double D = (0.48/(n*n))*Math.pow(volume_total*volume_total*Globals.Earth_gravitation_constant*density_delta/Math.pow(kinematic_viscosity_avg,0.5),1/3)*Math.pow(t,-0.5);

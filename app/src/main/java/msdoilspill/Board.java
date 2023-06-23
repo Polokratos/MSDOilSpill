@@ -7,7 +7,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -56,6 +58,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		advection();
 		spreading();
 		emulsification();
+		dispersion();
 		seashoreInteraction();
 
 		confirmCellMovenent();
@@ -67,19 +70,23 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (int x = 1; x < cells.length -1; ++x)
 			for (int y = 1; y < cells[x].length -1; ++y)
 			{
-				int deltaX_m = (int) (Globals.AdvectionAlpha*cells[x][y].cev.currentX_ms+Globals.AdvectionBeta*cells[x][y].cev.windX_ms)*Globals.simulationStep_s;
-				int deltaY_m = (int) (Globals.AdvectionAlpha*cells[x][y].cev.currentY_ms+Globals.AdvectionBeta*cells[x][y].cev.windY_ms)*Globals.simulationStep_s;
-				for (OilParticle ops : cells[x][y].civ.getParticles()) {
-					ops.advectionMovement(deltaX_m, deltaY_m);
+				if (cells[x][y].type==3) {
+					int deltaX_m = (int) (Globals.AdvectionAlpha * cells[x][y].cev.currentX_ms + Globals.AdvectionBeta * cells[x][y].cev.windX_ms) * Globals.simulationStep_s;
+					int deltaY_m = (int) (Globals.AdvectionAlpha * cells[x][y].cev.currentY_ms + Globals.AdvectionBeta * cells[x][y].cev.windY_ms) * Globals.simulationStep_s;
+					for (OilParticle ops : cells[x][y].civ.getParticles()) {
+						ops.advectionMovement(deltaX_m, deltaY_m);
+					}
 				}
 			}
 	}
 	public void spreading(){
-		for (int x = 0; x < cells.length; ++x)
-			for (int y = 0; y < cells[x].length; ++y)
+		for (int x = 1; x < cells.length-1; ++x)
+			for (int y = 1; y < cells[x].length-1; ++y)
 			{
-				cells[x][y].calculateSpreading(cells[x][y+1],0,1); //Von Neumann.
-				cells[x][y].calculateSpreading(cells[x+1][y],1,0);
+				if (cells[x][y].type!=0) {
+					cells[x][y].calculateSpreading(cells[x][y + 1], 0, 1); //Von Neumann.
+					cells[x][y].calculateSpreading(cells[x + 1][y], 1, 0);
+				}
 			}
 	}
 	public void evaporation() {
@@ -97,17 +104,30 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void emulsification() {
 		for (int x=1; x<cells.length; ++x){
 			for (int y=1; y<cells[x].length; ++y){
-				double wind_state = Math.pow(Math.pow(Math.pow(cells[x][y].cev.windX_ms, 2) + Math.pow(cells[x][y].cev.windY_ms, 2), 0.5) + 1, 2);
-				for (OilParticle op: cells[x][y].civ.getParticles()) {
-					double Yk = op.OPS.water_mass_kg/(op.OPS.water_mass_kg+ op.OPS.mass_kg);
-					double dYk = 2.0 * 10e-6* wind_state * (1 - Yk / 0.7) * Globals.simulationStep_s;
-					op.OPS.water_mass_kg = (Yk+dYk)*op.OPS.mass_kg / (1 - Yk+dYk);
+				if (cells[x][y].type==3) {
+					double wind_state = Math.pow(Math.pow(Math.pow(cells[x][y].cev.windX_ms, 2) + Math.pow(cells[x][y].cev.windY_ms, 2), 0.5) + 1, 2);
+					for (OilParticle op : cells[x][y].civ.getParticles()) {
+						double Yk = op.OPS.water_mass_kg / (op.OPS.water_mass_kg + op.OPS.mass_kg);
+						double dYk = 2.0 * 10e-6 * wind_state * (1 - Yk / 0.7) * Globals.simulationStep_s;
+						op.OPS.water_mass_kg = (Yk + dYk) * op.OPS.mass_kg / (1 - Yk + dYk);
+					}
 				}
 			}
 		}
 	}
 	public void dispersion() {
-
+		for (int x=1; x<cells.length; ++x){
+			for (int y=1; y<cells[x].length; ++y){
+				double Da = 0.11 * Math.pow((Math.pow(Math.pow(cells[x][y].cev.windX_ms, 2) + Math.pow(cells[x][y].cev.windY_ms, 2), 0.5)+1), 2);
+				for (OilParticle op: cells[x][y].civ.getParticles()){
+//					System.out.println(op.OPS.mass_kg);
+					double slick_thickness = 100 * op.OPS.getVolume()/(RNG.getInstance().nextDouble()*1000+0.003); // tutaj mamy problem z danymi
+					double Db = 1/(1+50*Math.pow(op.getDynamicViscosity(), 0.5)* slick_thickness*Globals.SurfaceTension_dyne_over_s);
+					double dm = op.OPS.mass_kg * Da * Db/3600 * Globals.simulationStep_s;
+					op.OPS.mass_kg-=dm;
+				}
+			}
+		}
 	}
 	public void viscosityChange() {
 
@@ -115,26 +135,28 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	public void seashoreInteraction() {
 		for (int x = 1; x<cells.length-1; ++x)
 			for (int y = 1; y<cells[x].length-1; ++y){
-				ArrayList<Integer> ocean_neighbours = new ArrayList<>();
-				for (int x1=-1; x1<=1; ++x1){
-					for (int y1=-1; y1<=1; ++y1){
-						if (x1!=0 && y1!=0 && cells[x+x1][y+y1].type==0){
-							ocean_neighbours.add((x1+1)*3 + (y1+1));
+				if (cells[x][y].type==2) {
+					ArrayList<Integer> ocean_neighbours = new ArrayList<>();
+					for (int x1 = -1; x1 <= 1; ++x1) {
+						for (int y1 = -1; y1 <= 1; ++y1) {
+							if (x1 != 0 && y1 != 0 && cells[x + x1][y + y1].type == 0) {
+								ocean_neighbours.add((x1 + 1) * 3 + (y1 + 1));
+							}
 						}
 					}
-				}
-				if (cells[x][y].type==1){
-					double total_mass = cells[x][y].civ.getTotalMass_kg();
-					double d_mass = -Math.log(2)/cells[x][y].cev.shoreline_half_life
-							*total_mass*Globals.simulationStep_s;
-					double probability = Math.abs(d_mass)/total_mass;
-					for (OilParticle oil_p: cells[x][y].civ.getParticles()){
-						if (RNG.getInstance().nextDouble()<probability){
-							int r = RNG.getInstance().nextInt(ocean_neighbours.size());
-							int cell_x = ocean_neighbours.get(r)/3-1;
-							int cell_y = ocean_neighbours.get(r)%3 - 1;
-							oil_p.locationDelta_x_m+=(cell_x-x)*CEV.cellSize_m;
-							oil_p.locationDelta_y_m+=(cell_y-y)*CEV.cellSize_m;
+					if (ocean_neighbours.size() > 0) {
+						double total_mass = cells[x][y].civ.getTotalMass_kg();
+						double d_mass = -Math.log(2) / cells[x][y].cev.shoreline_half_life
+								* total_mass * Globals.simulationStep_s;
+						double probability = Math.abs(d_mass) / total_mass;
+						for (OilParticle oil_p : cells[x][y].civ.getParticles()) {
+							if (RNG.getInstance().nextDouble() < probability) {
+								int r = RNG.getInstance().nextInt(ocean_neighbours.size());
+								int cell_x = ocean_neighbours.get(r) / 3 - 1;
+								int cell_y = ocean_neighbours.get(r) % 3 - 1;
+								oil_p.locationDelta_x_m += (cell_x - x) * CEV.cellSize_m;
+								oil_p.locationDelta_y_m += (cell_y - y) * CEV.cellSize_m;
+							}
 						}
 					}
 				}
@@ -145,6 +167,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		for (OilParticle op : OilParticle.allParticles) {
 			op.confirmMovement();
 		}
+		OilParticle.allParticles.removeIf(op -> op.OPS.mass_kg <= 0);
 	}
 	//#endregion
 
@@ -160,13 +183,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		cells = new Cell[length][height];
 
         try {
-            MapLoader.initCells(length, height, "src/main/resources/map.txt", cells);
+            MapLoader.initCells(length, height, "./app/src/main/resources/map.txt", cells);
         } catch (FileNotFoundException e) {
             System.out.println("Failed to load cell types from file: " + e.getMessage());
             System.exit(1);
         }
-
-}
+	}
 
 	protected void paintComponent(Graphics g) {
 		if (isOpaque()) {

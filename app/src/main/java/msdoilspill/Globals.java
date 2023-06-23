@@ -14,4 +14,7 @@ public class Globals {
     public static final double waterDensity_kg_over_m3 = 1000;
     public static final double oilDensity_kg_over_m3 = 835;
     public static final double Earth_gravitation_constant = 9.81;
+    public static final double oilDynamicViscosity = 0.310;
+    public static final double waterDynamicViscosity = 0.001;
+    public static final int SurfaceTension_dyne_over_s = 30;
 }
