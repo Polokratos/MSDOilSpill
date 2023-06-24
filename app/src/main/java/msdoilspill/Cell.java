@@ -49,13 +49,13 @@ public class Cell{
         }
 	}
 	
-	public void calculateSpreading(Cell with, int dX, int dY) /*dX, dY ==> FROM THIS TO WITH AT -1,0,1 scale*/
+	public void calculateSpreading(Cell with, int dX, int dY, int iter_num) /*dX, dY ==> FROM THIS TO WITH AT -1,0,1 scale*/
 	{
 		double kinematic_viscosity_avg = (this.civ.getKinematicViscosity_kg_over_ms() + with.civ.getKinematicViscosity_kg_over_ms())/2;
 		double volume_total = this.civ.getTotalVolume_m3() + with.civ.getTotalVolume_m3();
 //		double density_delta = (this.civ.getDensityDelta()+with.civ.getDensityDelta())/2;
 		double density_delta = (Globals.waterDensity_kg_over_m3-Globals.oilDensity_kg_over_m3)/Globals.waterDensity_kg_over_m3;
-		double t = 1; //FIXME: Unknowable
+		double t = (2*(double)iter_num+Globals.simulationStep_s)/2;
 		double n = 3; // From "calibrations" - wartosc z dupy
 		double D = (0.48/(n*n))*Math.pow(volume_total*volume_total*Globals.Earth_gravitation_constant*density_delta/Math.pow(kinematic_viscosity_avg,0.5),1/3)*Math.pow(t,-0.5);
 

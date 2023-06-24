@@ -16,6 +16,9 @@ public class OilParticle {
     public int locationDelta_x_m;
     public int locationDelta_y_m;
 
+    public double Y;
+    public double dY=0;
+
     //FIXME: Refactor via factory
     public OilParticle(int x_m,int y_m)
     {
@@ -58,7 +61,12 @@ public class OilParticle {
         //out of AO. FIXME: Right now oil decays on the borders, without actually leaving the AO. Intended?
         return null;
     }
-    public double getDynamicViscosity(){
-        return (OPS.mass_kg * Globals.oilDynamicViscosity + OPS.water_mass_kg * Globals.waterDynamicViscosity)/(OPS.mass_kg + OPS.water_mass_kg);
+
+    public double getdY() {
+        return dY;
+    }
+
+    public double getY() {
+        return Y;
     }
 }
