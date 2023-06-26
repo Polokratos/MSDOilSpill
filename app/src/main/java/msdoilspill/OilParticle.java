@@ -15,15 +15,17 @@ public class OilParticle {
 
     public double locationDelta_x_m;
     public double locationDelta_y_m;
+    public int initial_time=0;
 
     public double Y;
     public double dY=0;
 
-    public OilParticle(int x_m,int y_m)
+    public OilParticle(int x_m,int y_m, int iter_num)
     {
         OPS = new OPS(initial_mass_kg);
         location_x_m = x_m;
         location_y_m = y_m;
+        initial_time = iter_num;
         occupying = cacheoccupiedCell();
         occupying.civ.addParticle(this);
         allParticles.add(this);
