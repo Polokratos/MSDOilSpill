@@ -13,26 +13,30 @@ public class CEVLoader {
     // I will check, maybe the Speed and Dir are for wind, and u,v for current?
     public static void LoadToCells(String sourceFile, Cell[][] dest) throws FileNotFoundException,IOException
     {
+        
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile)));
-        int y = 0;
-        while(true)
-        {
-            String line = reader.readLine();
-            if(line == null) break;
-            StringTokenizer tokenizer = new StringTokenizer(line,",");
 
-            for(int x = 0; x < tokenizer.countTokens(); x++)
+        for (int y = 0; y < dest.length; y++) {
+            String line = reader.readLine();
+            StringTokenizer tokenizer = new StringTokenizer(line,",");
+            for(int x = 0; x < 227; x++)
             {
                 String token = tokenizer.nextToken();
                 String[] values = token.split(";");
                 
-                dest[x][y].cev.currentX_ms = Double.parseDouble(values[0]);
-                dest[x][y].cev.currentY_ms = Double.parseDouble(values[1]);
-                dest[x][y].cev.windX_ms = Double.parseDouble(values[2]);
-                dest[x][y].cev.windY_ms = Double.parseDouble(values[3]);
+                dest[y][x].cev.currentX_ms = Double.parseDouble(values[0]);
+                dest[y][x].cev.currentY_ms = Double.parseDouble(values[1]);
+                dest[y][x].cev.windX_ms    = Double.parseDouble(values[2]);
+                dest[y][x].cev.windY_ms    = Double.parseDouble(values[3]);
+                
+                if(Double.parseDouble(values[0])==0.0) System.out.println(values[0]);
+                if(Double.parseDouble(values[1])==0.0) System.out.println(values[1]);
+                if(Double.parseDouble(values[2])==0.0) System.out.println(values[2]);
+                if(Double.parseDouble(values[3])==0.0) System.out.println(values[3]);
+
             }
-            y++;
         }
         reader.close();
+
     }
 }

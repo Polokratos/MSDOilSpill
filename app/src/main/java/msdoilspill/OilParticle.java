@@ -9,12 +9,12 @@ public class OilParticle {
     
     public OPS OPS;
 
-    public int location_x_m; // X coordinate, in meters.
-    public int location_y_m; // Y coorddinate, in meters.
+    public double location_x_m; // X coordinate, in meters.
+    public double location_y_m; // Y coorddinate, in meters.
     public Cell occupying;
 
-    public int locationDelta_x_m;
-    public int locationDelta_y_m;
+    public double locationDelta_x_m;
+    public double locationDelta_y_m;
 
     public double Y;
     public double dY=0;
@@ -29,7 +29,7 @@ public class OilParticle {
         allParticles.add(this);
     }
 
-    public void advectionMovement(int deltaX_m, int deltaY_m)
+    public void advectionMovement(double deltaX_m, double deltaY_m)
     {
         locationDelta_x_m += deltaX_m;
         locationDelta_y_m += deltaY_m;
@@ -53,10 +53,10 @@ public class OilParticle {
 
     private Cell cacheoccupiedCell()
     {
-        int x = location_x_m / CEV.cellSize_m;
-        int y = location_y_m / CEV.cellSize_m;
+        double x = location_x_m / CEV.cellSize_m;
+        double y = location_y_m / CEV.cellSize_m;
         if( x > 0 && y>0 && x < Board.getInstance().cells.length && y < Board.getInstance().cells[0].length)
-            return Board.getInstance().cells[x][y];
+            return Board.getInstance().cells[(int)x][(int)y];
         return null;
     }
 

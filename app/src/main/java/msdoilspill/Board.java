@@ -53,6 +53,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	public void iteration(int iter_num) {
 		Spiller.spill();
+		LoadCurrentsIfNescesary(iter_num);
 		advection();
 		spreading(iter_num);
 		emulsification();
@@ -64,14 +65,30 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		this.repaint();
 	}
 
+	private int hr = 0;
+	public void LoadCurrentsIfNescesary(int iter_num)
+	{
+		if(iter_num*Globals.simulationStep_s>=hr*3600)
+		{
+			System.out.println("Loading! "+String.valueOf(hr));
+			hr++;
+			String path = Thread.currentThread().getContextClassLoader().getResource(String.valueOf(hr)+".csv").getPath();
+			try {
+				CEVLoader.LoadToCells(path,cells);	
+			} catch (Exception e) {
+				System.out.println("Failed to retrieve current data! "+e.getMessage());
+			}	
+		}
+	}
+
 	//#region Iteration component functions
 	public void advection(){
 		for (int x = 1; x < cells.length -1; ++x)
 			for (int y = 1; y < cells[x].length -1; ++y)
-			{
+			{	
 				if (cells[x][y].type==3) {
-					int deltaX_m = (int) (Globals.AdvectionAlpha * cells[x][y].cev.currentX_ms + Globals.AdvectionBeta * cells[x][y].cev.windX_ms) * Globals.simulationStep_s;
-					int deltaY_m = (int) (Globals.AdvectionAlpha * cells[x][y].cev.currentY_ms + Globals.AdvectionBeta * cells[x][y].cev.windY_ms) * Globals.simulationStep_s;
+					double deltaX_m = (Globals.AdvectionAlpha * cells[x][y].cev.currentX_ms + Globals.AdvectionBeta * cells[x][y].cev.windX_ms) * Globals.simulationStep_s;
+					double deltaY_m = (Globals.AdvectionAlpha * cells[x][y].cev.currentY_ms + Globals.AdvectionBeta * cells[x][y].cev.windY_ms) * Globals.simulationStep_s;
 					for (OilParticle ops : cells[x][y].civ.getParticles()) {
 						ops.advectionMovement(deltaX_m, deltaY_m);
 					}
@@ -184,7 +201,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 	private void initialize(int length, int height) {
 		cells = new Cell[length][height];
-
         try {
             MapLoader.initCells(length, height, "./app/src/main/resources/map.txt", cells);
         } catch (FileNotFoundException e) {
