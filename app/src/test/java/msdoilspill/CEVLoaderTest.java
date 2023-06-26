@@ -16,7 +16,7 @@ public class CEVLoaderTest {
         for(int x = 0; x < 227; x++)
             for(int y = 0; y < 400; y++)
             {
-                dst[x][y] = new Cell();
+                dst[x][y] = new Cell(-1); //type irrelevant for purposes of this test
             }
         
 

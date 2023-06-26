@@ -7,9 +7,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
@@ -64,6 +62,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 		confirmCellMovenent();
 		this.repaint();
+		System.out.println(cells[116][224].type);
 	}
 
 	//#region Iteration component functions

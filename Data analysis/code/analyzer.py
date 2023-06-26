@@ -97,6 +97,8 @@ def LonLatToCell(Lon,Lat):
     
     if(x < 0 or y < 0 or x > LENGTH or y > HEIGHT): raise ValueError("Out of bounds!")
     return [int(x),int(y)]
+
+print(LonLatToCell(-88.365997,28.736628))
     
 #How to get to a datapoint from this array: CEV[x][y][t] (x => length, y=> height, t => time)
 # 0 - u, 1 - v, 2 - u_wind, 3 - v_wind

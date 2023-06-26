@@ -8,12 +8,10 @@ public class CIV {
     public ArrayList<OilParticle> currentParticles = new ArrayList<>();
     
     public ArrayList<OilParticle> getParticles() { return currentParticles;}
-    //FIXME: Add guards against random shit.
     public void addParticle(OilParticle toAdd)
     {
         currentParticles.add(toAdd);
     }
-    //FIXME: Add guards against random shit.
     public void removeParticle(OilParticle toRemove)
     {
         currentParticles.remove(toRemove);
