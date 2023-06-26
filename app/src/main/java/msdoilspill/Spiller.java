@@ -7,7 +7,10 @@ public class Spiller {
      */
     public static void spill()
     {
-        spillInPlace(224,116,1000);
+        int spillDaily = 40920000;
+        int spillInSimStep = spillDaily * Globals.simulationStep_s / 86400;
+
+        spillInPlace(224,116,spillInSimStep);
     }
 
     /*
