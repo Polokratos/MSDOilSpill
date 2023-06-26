@@ -62,7 +62,6 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 
 		confirmCellMovenent();
 		this.repaint();
-		System.out.println(cells[116][224].type);
 	}
 
 	//#region Iteration component functions
