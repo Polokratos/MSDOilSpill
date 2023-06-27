@@ -52,12 +52,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	}
 
 	public void iteration(int iter_num) {
-		Spiller.spill();
+		Spiller.spill(iter_num);
 		LoadCurrentsIfNescesary(iter_num);
 		advection();
 		spreading(iter_num);
 		emulsification();
-		dispersion();
+		dispersion(iter_num);
 		viscosityChange();
 		seashoreInteraction();
 
@@ -133,12 +133,12 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			}
 		}
 	}
-	public void dispersion() {
+	public void dispersion(int iter_num) {
 		for (int x=1; x<cells.length; ++x){
 			for (int y=1; y<cells[x].length; ++y){
 				double Da = 0.11 * Math.pow((Math.pow(Math.pow(cells[x][y].cev.windX_ms, 2) + Math.pow(cells[x][y].cev.windY_ms, 2), 0.5)+1), 2);
 				for (OilParticle op: cells[x][y].civ.getParticles()){
-					double slick_thickness = 100 * op.OPS.getVolume()/(RNG.getInstance().nextDouble()*1000+0.003); // tutaj mamy problem z danymi
+					double slick_thickness = 100 * op.OPS.getVolume()/(RNG.getInstance().nextDouble()*(iter_num-op.initial_time)*Globals.simulationStep_s+0.003); // tutaj mamy problem z danymi
 					double Db = 1/(1+50*Math.pow(op.OPS.getDynamicViscosity(), 0.5)* slick_thickness*Globals.SurfaceTension_dyne_over_s);
 					double dm = op.OPS.mass_kg * Da * Db/3600 * Globals.simulationStep_s;
 					op.OPS.mass_kg-=dm;
