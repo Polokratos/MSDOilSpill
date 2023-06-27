@@ -16,7 +16,7 @@ Right_bd = -84.862920
 #454 x 800km => 227 x 400 cells.
 LENGTH = 454//2 #2x2 km
 HEIGHT = 800//2 
-TIME = 3 # 2 tyg.
+TIME = 24 # 1 d
 
 #28.736628 -88.365997 Rig Location
 
