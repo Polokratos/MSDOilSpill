@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
@@ -20,8 +19,6 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private Timer timer;
 	private Board board;
 	private JButton start;
-	private JButton clear;
-	private JComboBox<Integer> drawType;
 	private JSlider pred;
 	private JFrame frame;
 	private int iterNum = 0;
@@ -45,24 +42,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 		start.setActionCommand("Start");
 		start.addActionListener(this);
 
-		clear = new JButton("Calc Field");
-		clear.setActionCommand("clear");
-		clear.addActionListener(this);
-		
-		pred = new JSlider();
-		pred.setMinimum(0);
-		pred.setMaximum(maxDelay);
-		pred.addChangeListener(this);
-		pred.setValue(maxDelay - timer.getDelay());
-		
-		drawType = new JComboBox<Integer>(Cell.types);
-		drawType.addActionListener(this);
-		drawType.setActionCommand("drawType");
-
 		buttonPanel.add(start);
-		buttonPanel.add(clear);
-		buttonPanel.add(drawType);
-		buttonPanel.add(pred);
 
 		Board.setBoardWidth(400);
 		Board.setBoardHeight(227);
@@ -75,7 +55,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(timer)) {
 			iterNum++;
-			frame.setTitle("Sound simulation (" + Integer.toString(iterNum) + " iteration)");
+			frame.setTitle("Oil spill simulation (" + Integer.toString(iterNum) + " iteration)");
 			board.iteration(iterNum);
 		} else {
 			String command = e.getActionCommand();
@@ -88,19 +68,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 					start.setText("Start");
 				}
 				running = !running;
-				clear.setEnabled(true);
-
-			} else if (command.equals("clear")) {
-				iterNum = 0;
-				timer.stop();
-				start.setEnabled(true);
-				board.clear();
-			}
-			else if (command.equals("drawType")){
-				int newType = (Integer)drawType.getSelectedItem();
-				board.editType = newType;
-			}
-
+			} 
 		}
 	}
 
