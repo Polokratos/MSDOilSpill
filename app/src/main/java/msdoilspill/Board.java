@@ -218,30 +218,30 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		drawNetting(g, size);
 	}
 
-
 	private void drawNetting(Graphics g, int gridSpace) {
+		
 		Insets insets = getInsets();
 		int firstX = insets.left;
 		int firstY = insets.top;
 		int lastX = this.getWidth() - insets.right;
 		int lastY = this.getHeight() - insets.bottom;
 
-		int x = firstX;
-		while (x < lastX) {
-			g.drawLine(x, firstY, x, lastY);
-			x += gridSpace;
-		}
+		//int x = firstX;
+		//while (x < lastX) {
+		//	g.drawLine(x, firstY, x, lastY);
+		//	x += gridSpace;
+		//}
 
-		int y = firstY;
-		while (y < lastY) {
-			g.drawLine(firstX, y, lastX, y);
-			y += gridSpace;
-		}
+		//int y = firstY;
+		//while (y < lastY) {
+		//	g.drawLine(firstX, y, lastX, y);
+		//	y += gridSpace;
+		//}
 
-		for (x = 1; x < cells.length-1; ++x) {
-			for (y = 1; y < cells[x].length-1; ++y) {
+		for (int x = 1; x < cells.length-1; ++x) {
+			for (int y = 1; y < cells[x].length-1; ++y) {
 				g.setColor(cells[x][y].getColor());
-				g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
+				g.fillRect((x * size) + 1, (y * size) + 1, (size), (size));
 			}
 		}
 
